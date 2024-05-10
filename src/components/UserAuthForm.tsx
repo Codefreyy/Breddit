@@ -14,7 +14,6 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
   const { toast } = useToast()
   const signInWithGoogle = async () => {
     setIsLoading(true)
-    console.log("signing in with google")
     try {
       signIn("google")
     } catch (error) {
@@ -25,7 +24,6 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
         variant: "destructive",
       })
     } finally {
-      console.log("done")
       setIsLoading(false)
     }
   }
