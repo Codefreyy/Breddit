@@ -12,8 +12,9 @@ interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
-  const signInWithGoogle = () => {
+  const signInWithGoogle = async () => {
     setIsLoading(true)
+    console.log("signing in with google")
     try {
       signIn("google")
     } catch (error) {
@@ -24,6 +25,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
         variant: "destructive",
       })
     } finally {
+      console.log("done")
       setIsLoading(false)
     }
   }
@@ -34,6 +36,8 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, ...props }) => {
         onClick={signInWithGoogle}
         size="sm"
         className="w-full"
+        type="button"
+        disabled={isLoading}
       >
         {isLoading ? null : <Icons.google className="w-4 h-4 mr-2" />}
         Google
