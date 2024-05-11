@@ -60,24 +60,18 @@ model User {
   Post        Post[]
   Commnet     Comment[]
   CommentVote CommentVote[]
-  Subreddit   Subreddit[]
-  Subreddit   Subreddit[]
 }
 
 model Subreddit {
   id        String   @id @default(cuid()) @map("_id")
-  name      String   @unique
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   posts     Post[]
 
-  creatorId    String?
-  Creator      User?          @relation(fields: [creatorId], references: [id])
-  subscribers  User?          @relation(fields: [userId], references: [id])
-  User         User?          @relation(fields: [userId], references: [id])
-  userId       String?
-  userId       String?
-  Subscription Subscription[]
+  creatorId   String?
+  creator     User?          @relation("CreatedBy", fields: [creatorId], references: [id])
+  subscribers Subscription[]
 
   @@index([name])
 }
@@ -88,11 +82,11 @@ model Subscription {
   subreddit   Subreddit @relation(fields: [subredditId], references: [id])
   subredditId String
 
-  @@id([userId, subredditId])
+  id String @id @default(uuid()) @map("_id")
 }
 
 model Post {
-  id          String    @id @default(cuid())
+  id          String    @id @default(cuid()) @map("_id")
   title       String
   content     Json?
   createdAt   DateTime  @default(now())
@@ -106,7 +100,7 @@ model Post {
 }
 
 model Comment {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) @map("_id")
   text      String
   createdAt DateTime @default(now())
   author    User     @relation(fields: [authorId], references: [id])
@@ -129,7 +123,7 @@ model Vote {
   postId String
   type   VoteType
 
-  @@id([userId, postId])
+  id Int @id @map("_id")
 }
 
 model CommentVote {
@@ -139,5 +133,5 @@ model CommentVote {
   commentId String
   type      VoteType
 
-  @@id([userId, commentId])
+  id Int @id @map("_id")
 }
