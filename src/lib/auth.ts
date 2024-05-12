@@ -16,7 +16,8 @@ export const authOptions: NextAuthOptions = {
     providers: [
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            authorization: `https://accounts.google.com/o/oauth2/auth/authorize?response_type=code&prompt=login`,
         })
     ],
     //https://next-auth.js.org/configuration/callbacks
