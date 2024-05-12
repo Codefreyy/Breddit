@@ -18,9 +18,10 @@ const Page = () => {
   const { mutate: createCommunity, isLoading } = useMutation({
     mutationFn: async () => {
       const payload: CreateSubredditPayload = {
-        name: input,
+        name: input.trim(),
       }
       const { data } = await axios.post("/api/subreddit", payload)
+      return data
     },
     onError: (error) => {
       if (error instanceof AxiosError) {
@@ -55,7 +56,7 @@ const Page = () => {
       router.push(`/r/${data}`)
       toast({
         title: "Success",
-        description: `Community ${data} created!`
+        description: `Community ${data} created!`,
       })
     },
   })
