@@ -62,7 +62,7 @@ const Page = () => {
   })
 
   return (
-    <div className="container flex items-center h-full mx-auto max-w-3xl ">
+    <li className="container flex items-center h-full mx-auto max-w-3xl ">
       <div className="relative bg-white w-full h-fit rounded-lg p-4 space-y-6">
         <h1 className="font-semibold text-3xl md:text-4xl mb-4">
           Create a community
@@ -97,7 +97,7 @@ const Page = () => {
           </Button>
         </div>
       </div>
-    </div>
+    </li>
   )
 }
 

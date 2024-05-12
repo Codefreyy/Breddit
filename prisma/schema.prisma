@@ -82,7 +82,7 @@ model Subscription {
   subreddit   Subreddit @relation(fields: [subredditId], references: [id])
   subredditId String
 
-  id String @id @default(uuid()) @map("_id")
+  subscriptionId String @id @default(uuid()) @map("_id")
 }
 
 model Post {
