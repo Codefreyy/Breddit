@@ -7,18 +7,23 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type EditorJS from "@editorjs/editorjs"
 import { uploadFiles } from "@/lib/uploadthing"
+import { toast } from "@/hooks/use-toast"
+import { useMutation } from "@tanstack/react-query"
+import axios from "axios"
+import { usePathname } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 export function Editor({ subredditId }: { subredditId: string }) {
   const ref = useRef<EditorJS>()
   const [isMounted, setIsMount] = useState(false)
+  const pathName = usePathname()
+  const router = useRouter()
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setIsMount(true)
-    }
-  }, [setIsMount])
-
-  const { register, handleSubmit } = useForm<PostCreationType>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PostCreationType>({
     resolver: zodResolver(PostValidator),
     defaultValues: {
       title: "",
@@ -104,13 +109,75 @@ export function Editor({ subredditId }: { subredditId: string }) {
     }
   }, [isMounted, editorInitializer])
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMount(true)
+    }
+  }, [setIsMount])
+
+  useEffect(() => {
+    if (Object.keys(errors).length) {
+      for (const [_key, value] of Object.entries(errors)) {
+        toast({
+          title: "Error",
+          description: (value as { message: string }).message,
+        })
+      }
+    }
+  }, [errors])
+
   // share the ref with react-hook-form register
   const _titleRef = useRef<HTMLTextAreaElement>(null)
   const { ref: titleRef, ...rest } = register("title")
 
+  const { mutate: createPost } = useMutation({
+    mutationFn: async ({ title, content, subredditId }: PostCreationType) => {
+      const payload: PostCreationType = {
+        title,
+        content,
+        subredditId,
+      }
+      const { data } = await axios.post("/api/subreddit/post/create", payload)
+
+      return data
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Your post was not published. Please try again later.",
+        variant: "destructive",
+      })
+    },
+    onSuccess: () => {
+      const newPathName = pathName.split("/").slice(0, -1).join("/")
+      router.push(newPathName)
+
+      router.refresh()
+      return toast({
+        title: "Success",
+        description: "Your post has been published.",
+      })
+    },
+  })
+
+  async function onSubmit(data: PostCreationType) {
+    const blocks = await ref.current?.save()
+    const payload: PostCreationType = {
+      title: data.title,
+      content: blocks,
+      subredditId,
+    }
+
+    createPost(payload)
+  }
+
   return (
     <div className="w-full p-4 bg-zinc-50 border-zinc-200 border rounded-lg">
-      <form id="subscribe-post-form" className="w-fit">
+      <form
+        id="subreddit-post-form"
+        className="w-fit"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <div className="prose prose-stone dark:prose-invert">
           <TextareaAutosize
             ref={(e) => {
