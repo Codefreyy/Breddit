@@ -85,7 +85,7 @@ const Layout = async ({
               />
             ) : null}
 
-            {/* <Link
+            <Link
               className={buttonVariants({
                 variant: "outline",
                 className: "w-full mb-6",
@@ -93,7 +93,7 @@ const Layout = async ({
               href={`r/${slug}/submit`}
             >
               Create Post
-            </Link> */}
+            </Link>
           </dl>
         </div>
       </div>
