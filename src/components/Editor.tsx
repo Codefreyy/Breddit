@@ -88,21 +88,37 @@ export function Editor({ subredditId }: { subredditId: string }) {
       await editorInitializer()
       setTimeout(() => {
         // set focus to title
-      })
+        _titleRef.current?.focus()
+      }, 0)
     }
 
     if (isMounted) {
       init()
 
-      return () => {}
+      return () => {
+        if (ref.current) {
+          ref.current.destroy() // clean the resources the editor instance used
+          ref.current = undefined // remove the reference
+        }
+      }
     }
   }, [isMounted, editorInitializer])
+
+  // share the ref with react-hook-form register
+  const _titleRef = useRef<HTMLTextAreaElement>(null)
+  const { ref: titleRef, ...rest } = register("title")
 
   return (
     <div className="w-full p-4 bg-zinc-50 border-zinc-200 border rounded-lg">
       <form id="subscribe-post-form" className="w-fit">
         <div className="prose prose-stone dark:prose-invert">
           <TextareaAutosize
+            ref={(e) => {
+              titleRef(e)
+              // @ts-ignore
+              _titleRef.current = e
+            }}
+            {...rest}
             placeholder="Title"
             className="w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none"
           />
