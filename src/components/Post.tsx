@@ -7,7 +7,7 @@ import { FC, useRef } from "react"
 import EditorOutput from "./EditorOutput"
 import PostVoteClient from "./post-vote/PostVoteClient"
 
-type PartialVote = Pick<Vote, "type">
+export type PartialVote = Pick<Vote, "type">
 
 interface PostProps {
   post: Post & {
@@ -34,7 +34,7 @@ const Post: FC<PostProps> = ({
         {/* PostVoteClient */}
         <PostVoteClient
           postId={post.id}
-          currentVote={currentVote}
+          initialVote={currentVote?.type}
           initialVoteAmt={votesAmt}
         />
         <div className="w-0 flex-1">

@@ -89,6 +89,7 @@ const Layout = async ({
               className={buttonVariants({
                 variant: "outline",
                 className: "w-full mb-6",
+                
               })}
               href={`r/${slug}/submit`}
             >

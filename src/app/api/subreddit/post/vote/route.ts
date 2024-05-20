@@ -109,18 +109,9 @@ export async function PATCH(req: Request) {
         // if no existing vote, create a new vote
         await db.vote.create({
             data: {
-                id: 1, // Replace "1" with the actual ID value
                 type: voteType,
-                post: {
-                    connect: {
-                        id: postId,
-                    },
-                },
-                user: {
-                    connect: {
-                        id: session.user.id,
-                    },
-                },
+                postId: postId,
+                userId: session.user.id,
             },
         })
 
@@ -151,7 +142,6 @@ export async function PATCH(req: Request) {
             return new Response(error.message, { status: 400 })
         }
 
-        console.log('error!', error)
         return new Response(
             'Could not post to subreddit at this time. Please try later',
             { status: 500 }
