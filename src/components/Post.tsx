@@ -4,6 +4,7 @@ import { MessageSquare } from "lucide-react"
 import Link from "next/link"
 
 import { FC, useRef } from "react"
+import EditorOutput from "./EditorOutput"
 
 type PartialVote = Pick<Vote, "type">
 
@@ -59,6 +60,7 @@ const Post: FC<PostProps> = ({
             className="relative text-sm max-h-40 w-full overflow-clip"
             ref={pRef}
           >
+            <EditorOutput content={post.content} />
             {pRef.current?.clientHeight == 160 ? (
               <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white to-transparent" />
             ) : null}
