@@ -9,6 +9,7 @@ import axios from "axios"
 import Post from "./Post"
 import { Vote } from "@prisma/client"
 import { useSession } from "next-auth/react"
+import { Loader2 } from "lucide-react"
 
 interface PostFeedProps {
   initialPosts: ExtendedPost[]
@@ -50,7 +51,7 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
   const _posts = data?.pages.flatMap((page) => page) ?? initialPosts
 
   return (
-    <div>
+    <ul className="flex flex-col col-span-2 space-y-6">
       {_posts?.map((post, index) => {
         const voteAmt = post.votes.reduce((acc: number, vote: Vote) => {
           if (vote.type == "UP") acc + 1
@@ -65,14 +66,35 @@ const PostFeed: FC<PostFeedProps> = ({ initialPosts, subredditName }) => {
         if (_posts.length === index + 1) {
           return (
             <li key={post.id} ref={ref}>
-              <Post post={post} />
+              <Post
+                post={post}
+                subredditName={post.subreddit.name}
+                commentAmt={post.comments.length}
+                votesAmt={voteAmt}
+                currentVote={currentVote}
+              />
             </li>
           )
+        } else {
+          return (
+            <Post
+              key={post.id}
+              post={post}
+              subredditName={post.subreddit.name}
+              commentAmt={post.comments.length}
+              votesAmt={voteAmt}
+              currentVote={currentVote}
+            />
+          )
         }
-
-        return <Post key={post.id} post={post} />
       })}
-    </div>
+
+      {isFetchingNextPage && (
+        <li className="flex justify-center">
+          <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
+        </li>
+      )}
+    </ul>
   )
 }
 
