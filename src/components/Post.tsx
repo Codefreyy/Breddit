@@ -5,6 +5,7 @@ import Link from "next/link"
 
 import { FC, useRef } from "react"
 import EditorOutput from "./EditorOutput"
+import PostVoteClient from "./post-vote/PostVoteClient"
 
 type PartialVote = Pick<Vote, "type">
 
@@ -31,6 +32,11 @@ const Post: FC<PostProps> = ({
     <div className="rounded-md bg-white shadow">
       <div className="flex justify-between px-6 py-4">
         {/* PostVoteClient */}
+        <PostVoteClient
+          postId={post.id}
+          currentVote={currentVote}
+          initialVoteAmt={votesAmt}
+        />
         <div className="w-0 flex-1">
           <div className=" max-h-40 mt-1 text-xs text-gray-500">
             {subredditName ? (
