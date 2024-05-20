@@ -1,10 +1,12 @@
+"use client"
+
 import { FC } from "react"
 import { Button } from "../ui/Button"
 import { cn } from "@/lib/utils"
 import { ArrowBigDown, ArrowBigUp } from "lucide-react"
 import { useMutation } from "@tanstack/react-query"
 import { VoteType } from "@prisma/client"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { PostVoteRequest } from "@/lib/validators/vote"
 
 interface PostVoteClientProps {
@@ -18,7 +20,11 @@ const PostVoteClient: FC<PostVoteClientProps> = ({
   currentVote,
   initialVoteAmt,
 }) => {
-  const { isLoading, data, mutate } = useMutation({
+  const {
+    isLoading,
+    data,
+    mutate: vote,
+  } = useMutation({
     mutationFn: async (voteType: VoteType) => {
       // vote
       const payload: PostVoteRequest = {
@@ -26,13 +32,18 @@ const PostVoteClient: FC<PostVoteClientProps> = ({
         voteType,
       }
 
-      const { data } = await axios.patch("/api/subreddit/post/vote", payload)
+      await axios.patch("/api/subreddit/post/vote", payload)
     },
   })
 
   return (
     <div className="flex sm:flex-col gap-4 sm:gap-0 pr-6 sm:w-20 pb-4 sm:pb-0">
-      <Button size="sm" variant="ghost" arial-label="upvote">
+      <Button
+        size="sm"
+        variant="ghost"
+        aria-label="upvote"
+        onClick={() => vote("UP")}
+      >
         <ArrowBigUp
           className={cn("w-4 h-4", {
             "text-emerald-500 fill-emerald-400": currentVote?.type === "UP",
@@ -43,10 +54,15 @@ const PostVoteClient: FC<PostVoteClientProps> = ({
         {" "}
         {initialVoteAmt}
       </p>
-      <Button size="sm" variant="ghost" arial-label="downvote">
+      <Button
+        size="sm"
+        variant="ghost"
+        aria-label="downvote"
+        onClick={() => vote("DOWN")}
+      >
         <ArrowBigDown
           className={cn("w-4 h-4", {
-            "text-emerald-500 fill-emerald-400": currentVote?.type === "UP",
+            "text-emerald-500 fill-emerald-400": currentVote?.type === "DOWN",
           })}
         />
       </Button>

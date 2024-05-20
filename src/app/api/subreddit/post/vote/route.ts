@@ -1,7 +1,9 @@
-import { getAuthSession } from "@/lib/auth"
-import { db } from "@/lib/db"
-import { PostVoteValidator } from "@/lib/validators/vote"
-import { z } from "zod"
+import { getAuthSession } from '@/lib/auth'
+import { db } from '@/lib/db'
+import { redis } from '@/lib/redis'
+import { PostVoteValidator } from '@/lib/validators/vote'
+import { CachedPost } from '@/types/redis'
+import { z } from 'zod'
 
 const CACHE_AFTER_UPVOTES = 1
 
@@ -17,92 +19,142 @@ export async function PATCH(req: Request) {
             return new Response('Unauthorized', { status: 401 })
         }
 
-        const exsitingVote = await db.vote.findFirst({
+        // check if user has already voted on this post
+        const existingVote = await db.vote.findFirst({
             where: {
+                userId: session.user.id,
                 postId,
-                userId: session.user.id
-            }
+            },
         })
 
         const post = await db.post.findUnique({
             where: {
-                id: postId
+                id: postId,
             },
             include: {
                 author: true,
-                votes: true
-            }
+                votes: true,
+            },
         })
 
         if (!post) {
             return new Response('Post not found', { status: 404 })
         }
 
-        if (exsitingVote) {
-            if (exsitingVote.type == voteType) {
+        if (existingVote) {
+            // if vote type is the same as existing vote, delete the vote
+            if (existingVote.type === voteType) {
                 await db.vote.delete({
                     where: {
-                        id: exsitingVote.id
-                    }
+                        id: existingVote.id,
+                    },
                 })
 
-                // recount the votes
+                // Recount the votes
                 const votesAmt = post.votes.reduce((acc, vote) => {
-                    if (vote.type == 'UP') acc += 1
-                    if (vote.type == 'DOWN') acc -= 1
+                    if (vote.type === 'UP') return acc + 1
+                    if (vote.type === 'DOWN') return acc - 1
                     return acc
                 }, 0)
 
-                return new Response('Vote removed', { status: 200 })
+                if (votesAmt >= CACHE_AFTER_UPVOTES) {
+                    const cachePayload: CachedPost = {
+                        authorUsername: post.author.username ?? '',
+                        content: JSON.stringify(post.content),
+                        id: post.id,
+                        title: post.title,
+                        currentVote: null,
+                        createdAt: post.createdAt,
+                    }
 
+                    await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+                }
+
+                return new Response('OK')
             }
 
-
-
+            // if vote type is different, update the vote
             await db.vote.update({
                 where: {
-                    id: exsitingVote.id
+                    id: existingVote.id,
                 },
                 data: {
-                    type: voteType
-                }
+                    type: voteType,
+                },
             })
 
-            // recount the votes
+            // Recount the votes
             const votesAmt = post.votes.reduce((acc, vote) => {
-                if (vote.type == 'UP') acc += 1
-                if (vote.type == 'DOWN') acc -= 1
+                if (vote.type === 'UP') return acc + 1
+                if (vote.type === 'DOWN') return acc - 1
                 return acc
             }, 0)
 
-            return new Response('Voted', { status: 200 })
+            if (votesAmt >= CACHE_AFTER_UPVOTES) {
+                const cachePayload: CachedPost = {
+                    authorUsername: post.author.username ?? '',
+                    content: JSON.stringify(post.content),
+                    id: post.id,
+                    title: post.title,
+                    currentVote: voteType,
+                    createdAt: post.createdAt,
+                }
 
+                await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+            }
 
-
+            return new Response('OK')
         }
 
+        // if no existing vote, create a new vote
         await db.vote.create({
             data: {
+                id: 1, // Replace "1" with the actual ID value
                 type: voteType,
-                userId: session.user.id,
-                postId,
-                id: 0 // Add the "id" property with a default value
-            }
+                post: {
+                    connect: {
+                        id: postId,
+                    },
+                },
+                user: {
+                    connect: {
+                        id: session.user.id,
+                    },
+                },
+            },
         })
 
-        // recount the votes
+        // Recount the votes
         const votesAmt = post.votes.reduce((acc, vote) => {
-            if (vote.type == 'UP') acc += 1
-            if (vote.type == 'DOWN') acc -= 1
+            if (vote.type === 'UP') return acc + 1
+            if (vote.type === 'DOWN') return acc - 1
             return acc
         }, 0)
 
-        return new Response('Voted', { status: 200 })
+        if (votesAmt >= CACHE_AFTER_UPVOTES) {
+            const cachePayload: CachedPost = {
+                authorUsername: post.author.username ?? '',
+                content: JSON.stringify(post.content),
+                id: post.id,
+                title: post.title,
+                currentVote: voteType,
+                createdAt: post.createdAt,
+            }
 
+            await redis.hset(`post:${postId}`, cachePayload) // Store the post data as a hash
+        }
+
+        return new Response('OK')
     } catch (error) {
+        (error)
         if (error instanceof z.ZodError) {
             return new Response(error.message, { status: 400 })
         }
-        return new Response('Could not vote at this time. Please try again later.', { status: 500 })
+
+        console.log('error!', error)
+        return new Response(
+            'Could not post to subreddit at this time. Please try later',
+            { status: 500 }
+        )
     }
 }
