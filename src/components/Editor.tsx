@@ -12,8 +12,13 @@ import { useMutation } from "@tanstack/react-query"
 import axios from "axios"
 import { usePathname } from "next/navigation"
 import { useRouter } from "next/navigation"
+import { Button } from "./ui/Button"
 
-export function Editor({ subredditId }: { subredditId: string }) {
+export function Editor({
+  subredditId,
+}: {
+  subredditId: string
+}) {
   const ref = useRef<EditorJS>()
   const [isMounted, setIsMount] = useState(false)
   const pathName = usePathname()
@@ -130,7 +135,7 @@ export function Editor({ subredditId }: { subredditId: string }) {
   const _titleRef = useRef<HTMLTextAreaElement>(null)
   const { ref: titleRef, ...rest } = register("title")
 
-  const { mutate: createPost } = useMutation({
+  const { mutate: createPost, isLoading } = useMutation({
     mutationFn: async ({ title, content, subredditId }: PostCreationType) => {
       const payload: PostCreationType = {
         title,
@@ -171,7 +176,9 @@ export function Editor({ subredditId }: { subredditId: string }) {
     createPost(payload)
   }
 
+
   return (
+   <>
     <div className="w-full p-4 bg-zinc-50 border-zinc-200 border rounded-lg">
       <form
         id="subreddit-post-form"
@@ -194,5 +201,17 @@ export function Editor({ subredditId }: { subredditId: string }) {
         </div>
       </form>
     </div>
+     <div className="w-full flex justify-end">
+     <Button
+       type="submit"
+       className="w-full"
+       form="subreddit-post-form"
+       isLoading={isLoading}
+       disabled={isLoading}
+     >
+       Post
+     </Button>
+   </div>
+   </>
   )
 }

@@ -70,6 +70,9 @@ export async function GET(req: Request) {
 
         return new Response(JSON.stringify(posts))
     } catch (error) {
+        if (error instanceof z.ZodError) {
+            return new Response('Invalid request data passed', { status: 422 })
+        }
         return new Response('Could not fetch posts', { status: 500 })
     }
 }

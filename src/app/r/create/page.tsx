@@ -89,9 +89,10 @@ const Page = () => {
             Cancel
           </Button>
           <Button
+            type="button"
             onClick={() => createCommunity()}
             isLoading={isLoading}
-            disabled={input.length == 0}
+            disabled={input.length == 0 || isLoading}
           >
             Create Community
           </Button>

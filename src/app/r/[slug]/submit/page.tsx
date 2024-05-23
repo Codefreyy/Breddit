@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/Button"
 import { Editor } from "@/components/Editor"
 import { db } from "@/lib/db"
 
@@ -25,11 +24,6 @@ export default async function Page({
 
       {/* form */}
       <Editor subredditId={subreddit?.id!} />
-      <div className="w-full flex justify-end">
-        <Button type="submit" className="w-full" form="subreddit-post-form">
-          Post
-        </Button>
-      </div>
     </div>
   )
 }
