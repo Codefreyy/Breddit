@@ -6,10 +6,9 @@ import { useToast } from "@/hooks/use-toast"
 import { SubscribeToSubredditPayload } from "@/lib/validators/subreddit"
 import { useMutation } from "@tanstack/react-query"
 import axios, { AxiosError } from "axios"
-import { is } from "date-fns/locale"
-import { unsubscribe } from "diagnostics_channel"
 import { useRouter } from "next/navigation"
-import { startTransition } from "react"
+import { startTransition, useState } from "react"
+
 interface SubscribeLeaveToggleProps {
   isSubscribed: boolean
   subredditId: string
@@ -21,6 +20,7 @@ const SubscribeLeaveToggle = ({
   subredditId,
   subredditName,
 }: SubscribeLeaveToggleProps) => {
+  const [localIsSubscribed, setLocalIsSubscribed] = useState(isSubscribed)
   const { loginToast } = useCustomToast()
   const { toast } = useToast()
   const router = useRouter()
@@ -29,12 +29,10 @@ const SubscribeLeaveToggle = ({
     mutationFn: async () => {
       // leave community
       const payload: SubscribeToSubredditPayload = {
-        subredditId: subredditId,
+        subredditId,
       }
 
-      const { data } = await axios.post("/api/subreddit/subscribe", {
-        data: payload,
-      })
+      const { data } = await axios.post("/api/subreddit/subscribe", payload)
       return data
     },
     onError: (err) => {
@@ -52,12 +50,14 @@ const SubscribeLeaveToggle = ({
     },
     onSuccess: () => {
       // handle success
+      setLocalIsSubscribed(true)
+
+      startTransition(() => {
+        router.refresh()
+      })
       toast({
         title: "Subscribed",
         description: `You have successfully subscribed to r/${subredditName}`,
-      })
-      startTransition(() => {
-        router.refresh()
       })
     },
   })
@@ -69,9 +69,7 @@ const SubscribeLeaveToggle = ({
         subredditId: subredditId,
       }
 
-      const { data } = await axios.post("/api/subreddit/unsubscribe", {
-        data: payload,
-      })
+      const { data } = await axios.post("/api/subreddit/unsubscribe", payload)
       return data
     },
     onError: (err) => {
@@ -88,17 +86,18 @@ const SubscribeLeaveToggle = ({
       })
     },
     onSuccess: () => {
+      setLocalIsSubscribed(false)
+      startTransition(() => {
+        router.refresh()
+      })
       toast({
         title: "Success",
         description: `You have successfully unsubscribed to r/${subredditName}`,
       })
-      startTransition(() => {
-        router.refresh()
-      })
     },
   })
 
-  return isSubscribed ? (
+  return localIsSubscribed ? (
     <Button
       onClick={() => unsubscribe()}
       isLoading={isUnsubLoading}
