@@ -58,7 +58,7 @@ model User {
   accounts    Account[]
   sessions    Session[]
   Post        Post[]
-  Commnet     Comment[]
+  Comment     Comment[]
   CommentVote CommentVote[]
 }
 
@@ -132,5 +132,5 @@ model CommentVote {
   commentId String
   type      VoteType
 
-  id Int @id @map("_id")
+  id String @id @default(cuid()) @map("_id")
 }
