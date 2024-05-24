@@ -1,3 +1,4 @@
+import CommentSection from "@/components/CommentSection"
 import EditorOutput from "@/components/EditorOutput"
 import PostVoteServer from "@/components/post-vote/PostVoteServer"
 import { buttonVariants } from "@/components/ui/Button"
@@ -42,7 +43,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
 
   return (
     <div>
-      <div className="h-full flex flex-col sm:flex-row items-start justify-between">
+      <div className="h-full flex flex-col sm:flex-row youcidcitems-start justify-between">
         <Suspense fallback={<PostVoteShell />}>
           {/* @ts-expect-error server component */}
           <PostVoteServer
@@ -74,7 +75,10 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
             fallback={
               <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
             }
-          ></Suspense>
+          >
+            {/* @ts-expect-error server component */}
+            <CommentSection postId={post?.id ?? cachedPost.id} />
+          </Suspense>
         </div>
       </div>
     </div>
