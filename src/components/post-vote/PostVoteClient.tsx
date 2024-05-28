@@ -18,6 +18,7 @@ interface PostVoteClientProps {
   initialVote?: VoteType
 }
 
+// render the UI (optimistic update) and handle user's voting actions
 const PostVoteClient = ({
   postId,
   initialVoteAmt,
