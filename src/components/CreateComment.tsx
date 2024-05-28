@@ -45,7 +45,6 @@ const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
     },
     onSuccess: () => {
       router.refresh()
-      console.log("success")
       setInput("")
     },
   })

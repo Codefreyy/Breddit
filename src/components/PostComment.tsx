@@ -96,6 +96,8 @@ export default function PostComment({
         <Button
           onClick={() => {
             if (!session) return router.push("/login")
+              setInput(`@${comment.author.username} `)
+
             setIsReplying(true)
           }}
           variant="ghost"
@@ -123,7 +125,6 @@ export default function PostComment({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               rows={1}
-              placeholder="What are your thoughts?"
             />
 
             <div className="mt-2 flex justify-end gap-2">
