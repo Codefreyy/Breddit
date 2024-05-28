@@ -67,7 +67,7 @@ export default function PostComment({
   })
 
   return (
-    <div ref={commentRef}>
+    <div ref={commentRef} className="flex flex-col">
       <div className="flex items-center">
         <UserAvatar
           user={{

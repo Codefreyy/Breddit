@@ -57,6 +57,7 @@ export const CommentVotes = ({
         variant: "destructive",
       })
     },
+    // optimistic update
     onMutate: (type: VoteType) => {
       if (currentVote?.type === type) {
         // User is voting the same way again, so remove their vote

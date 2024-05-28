@@ -1,35 +1,59 @@
 import { getAuthSession } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { z } from "zod"
-
+import { CommentVoteValidator } from "@/lib/validators/vote"
 
 export async function PATCH(req: Request) {
     try {
-        const session = await getAuthSession()
-        if (!session?.user) {
-            return new Response('Unauthorized', { status: 401 })
-        }
 
         const body = await req.json()
-        const { voteType, commentId } = body
 
-        // if no existing vote, create a new vote
+        const { commentId, voteType } = CommentVoteValidator.parse(body)
+
+        const session = await getAuthSession()
+        if (!session) {
+            return new Response("Unauthorized", { status: 401 })
+        }
+
+        const existingVote = await db.commentVote.findFirst({
+            where: {
+                userId: session.user.id,
+                commentId
+            }
+        })
+
+        if (existingVote) {
+            if (existingVote.type == voteType) {
+                // the user is voting the same way again, so remove their vote
+                await db.commentVote.delete({
+                    where: {
+                        id: existingVote.id
+                    }
+                })
+                return new Response("Vote removed", { status: 200 })
+            } else {
+                await db.commentVote.update({
+                    where: {
+                        id: existingVote.id
+                    },
+                    data: {
+                        type: voteType
+                    }
+                })
+                return new Response("Vote updated", { status: 200 })
+            }
+        }
+
+        // if the user hasn't voted on this comment yet, create a new vote
         await db.commentVote.create({
             data: {
                 type: voteType,
                 commentId,
-                userId: session.user.id,
-            },
+                userId: session.user.id
+            }
         })
+        return new Response("Vote created", { status: 200 })
 
-        return new Response('OK')
     } catch (error) {
-        if (error instanceof z.ZodError) {
-            return new Response(error.message, { status: 400 })
-        }
-        return new Response(
-            'Could not vote to this comment. Please try later',
-            { status: 500 }
-        )
+        return new Response("Something went wrong.", { status: 500 })
     }
 }
