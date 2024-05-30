@@ -2,8 +2,6 @@ import { getAuthSession } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { z } from 'zod'
 
-export const maxDuration = 300
-
 export async function GET(req: Request) {
     const url = new URL(req.url)
 

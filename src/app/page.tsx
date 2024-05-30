@@ -5,6 +5,9 @@ import Link from "next/link"
 import CustomFeed from "@/components/CustomFeed"
 import GeneralFeed from "@/components/GeneralFeed"
 
+export const dynamic = "force-dynamic"
+export const fetchCache = "force-no-store"
+
 export default async function Home() {
   const session = await getAuthSession()
   return (
