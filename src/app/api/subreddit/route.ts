@@ -3,6 +3,9 @@ import { db } from "@/lib/db"
 import { SubredditValidator } from "@/lib/validators/subreddit"
 import { z } from "zod"
 
+
+export const maxDuration = 300
+
 export async function POST(req: Request) {
     try {
         // is the user login?
