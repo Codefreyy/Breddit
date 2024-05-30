@@ -9,20 +9,18 @@ import type EditorJS from "@editorjs/editorjs"
 import { uploadFiles } from "@/lib/uploadthing"
 import { toast } from "@/hooks/use-toast"
 import { useMutation } from "@tanstack/react-query"
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 import { usePathname } from "next/navigation"
 import { useRouter } from "next/navigation"
 import { Button } from "./ui/Button"
+import { useCustomToast } from "@/hooks/use-custom-toast"
 
-export function Editor({
-  subredditId,
-}: {
-  subredditId: string
-}) {
+export function Editor({ subredditId }: { subredditId: string }) {
   const ref = useRef<EditorJS>()
   const [isMounted, setIsMount] = useState(false)
   const pathName = usePathname()
   const router = useRouter()
+  const { loginToast } = useCustomToast()
 
   const {
     register,
@@ -146,7 +144,10 @@ export function Editor({
 
       return data
     },
-    onError: () => {
+    onError: (err: AxiosError) => {
+      if (err?.response?.status == 401) {
+        return loginToast()
+      }
       toast({
         title: "Error",
         description: "Your post was not published. Please try again later.",
@@ -176,42 +177,41 @@ export function Editor({
     createPost(payload)
   }
 
-
   return (
-   <>
-    <div className="w-full p-4 bg-zinc-50 border-zinc-200 border rounded-lg">
-      <form
-        id="subreddit-post-form"
-        className="w-fit"
-        onSubmit={handleSubmit(onSubmit)}
-      >
-        <div className="prose prose-stone dark:prose-invert">
-          <TextareaAutosize
-            ref={(e) => {
-              titleRef(e)
-              // @ts-ignore
-              _titleRef.current = e
-            }}
-            {...rest}
-            placeholder="Title"
-            className="w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none"
-          />
+    <>
+      <div className="w-full p-4 bg-zinc-50 border-zinc-200 border rounded-lg">
+        <form
+          id="subreddit-post-form"
+          className="w-fit"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <div className="prose prose-stone dark:prose-invert">
+            <TextareaAutosize
+              ref={(e) => {
+                titleRef(e)
+                // @ts-ignore
+                _titleRef.current = e
+              }}
+              {...rest}
+              placeholder="Title"
+              className="w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none"
+            />
 
-          <div id="editor" className="min-h-[500px]" />
-        </div>
-      </form>
-    </div>
-     <div className="w-full flex justify-end">
-     <Button
-       type="submit"
-       className="w-full"
-       form="subreddit-post-form"
-       isLoading={isLoading}
-       disabled={isLoading}
-     >
-       Post
-     </Button>
-   </div>
-   </>
+            <div id="editor" className="min-h-[500px]" />
+          </div>
+        </form>
+      </div>
+      <div className="w-full flex justify-end">
+        <Button
+          type="submit"
+          className="w-full"
+          form="subreddit-post-form"
+          isLoading={isLoading}
+          disabled={isLoading}
+        >
+          Post
+        </Button>
+      </div>
+    </>
   )
 }
