@@ -12,12 +12,15 @@ import UserAvatar from "./UserAvatar"
 import { User } from "next-auth"
 import Link from "next/link"
 import { signOut } from "next-auth/react"
+import { Edit2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface UserAccountNavProps {
   user: Pick<User, "image" | "name" | "email">
 }
 
 const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
+  const router = useRouter()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -32,7 +35,15 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
       <DropdownMenuContent align="end" className="bg-white">
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col gap-1">
-            <p className="font-medium">{user.name}</p>
+            <div className="font-medium flex gap-3 items-center">
+              {user.name}{" "}
+              <Edit2
+                className="w-3 h-3 cursor-pointer hover:scale-110"
+                onClick={() => {
+                  router.push("/settings")
+                }}
+              />
+            </div>
             <p className="w-[200px] truncate text-sm text-zinc-600">
               {user.email}
             </p>
