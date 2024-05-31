@@ -21,7 +21,7 @@ import axios, { AxiosError } from "axios"
 import { toast } from "@/hooks/use-toast"
 
 interface UsernameFormProps {
-  user: Pick<User, "id" | "username">
+  user: Pick<User, "id" | "name">
   className: string
 }
 
@@ -37,7 +37,7 @@ export default function UsernameForm({
   } = useForm<UsernameType>({
     resolver: zodResolver(UsernameFormValidator),
     defaultValues: {
-      name: user?.username || "",
+      name: user?.name || "",
     },
   })
 
@@ -95,7 +95,7 @@ export default function UsernameForm({
               {...register("name")}
               id="name"
               className="w-[400px] pl-8"
-              placeholder={`${user.username}`}
+              placeholder={`${user.name}`}
             />
             {errors.name ? (
               <p className="px-1 text-xs text-red-600">{errors.name.message}</p>
