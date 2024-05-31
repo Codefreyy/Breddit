@@ -22,7 +22,7 @@ import { toast } from "@/hooks/use-toast"
 
 interface UsernameFormProps {
   user: Pick<User, "id" | "name">
-  className: string
+  className?: string
 }
 
 export default function UsernameForm({
