@@ -1,3 +1,4 @@
+import BackButton from "@/components/BackButton"
 import CommentSection from "@/components/CommentSection"
 import EditorOutput from "@/components/EditorOutput"
 import PostVoteServer from "@/components/post-vote/PostVoteServer"
@@ -43,6 +44,7 @@ const SubRedditPostPage = async ({ params }: SubRedditPostPageProps) => {
 
   return (
     <div>
+      <BackButton />
       <div className="h-full flex flex-col sm:flex-row youcidcitems-start justify-between">
         <Suspense fallback={<PostVoteShell />}>
           {/* @ts-expect-error server component */}
