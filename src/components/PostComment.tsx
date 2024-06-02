@@ -95,7 +95,7 @@ export default function PostComment({
         />
         <Button
           onClick={() => {
-            if (!session) return router.push("/login")
+            if (!session) return router.push("/sign-in")
             setInput(`@${comment.author.username} `)
             setIsReplying(true)
           }}
