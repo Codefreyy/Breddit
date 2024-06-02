@@ -9,7 +9,7 @@ export default function SignIn() {
         <Icons.logo className="w-6 h-6 mx-auto" />
         <h1 className="font-semibold text-2xl tracking-tight">Welcome back</h1>
         <p className="max-w-xs text-sm mx-auto">
-          By continuing, you are setting up a Breadit account and agree to our
+          By continuing, you are setting up a Breddit account and agree to our
           User Agreement and Privacy Policy.
         </p>
       </div>
