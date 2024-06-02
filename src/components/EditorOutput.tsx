@@ -1,13 +1,14 @@
 "use client"
 
-import dynamic from "next/dynamic"
-import { FC, useEffect } from "react"
+// import dynamic from "next/dynamic"
+import { FC, useEffect, useRef } from "react"
 import hljs from "highlight.js"
 import "highlight.js/styles/github.css"
+import Output from "editorjs-react-renderer"
 
-const Output = dynamic(async () => await import("editorjs-react-renderer"), {
-  ssr: false,
-})
+// const Output = dynamic(async () => await import("editorjs-react-renderer"), {
+//   ssr: false,
+// })
 
 interface EditorOutputProps {
   content: any
@@ -44,7 +45,7 @@ function CustomImageRenderer({ data }: any) {
 function CustomCodeRenderer({ data }: any) {
   useEffect(() => {
     hljs.highlightAll()
-  }, [])
+  }, [data.code])
   return (
     <pre className="rounded-md">
       <code className="text-gray-100 text-sm">{data.code}</code>

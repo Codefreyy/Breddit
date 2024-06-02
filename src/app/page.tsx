@@ -24,6 +24,7 @@ export default async function Home() {
             <span className="font-semibold">Home</span>
           </div>
           <div className="divide-gray-100 p-6 flex flex-col justify-between gap-6 text-sm leading-6">
+            {/* todo:fixed when scrolling */}
             <p className="text-zinc-500">
               Your personal Breadit homepage come here to check in with your
               favorite communities.

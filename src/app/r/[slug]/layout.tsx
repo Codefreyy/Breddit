@@ -90,7 +90,7 @@ const Layout = async ({
                 variant: "outline",
                 className: "w-full mb-6",
               })}
-              href={`r/${slug}/submit`}
+              href={`/r/${slug}/submit`} // should use absolute path here
             >
               Create Post
             </Link>

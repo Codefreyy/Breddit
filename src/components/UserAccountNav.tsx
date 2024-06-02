@@ -12,6 +12,7 @@ import UserAvatar from "./UserAvatar"
 import { User } from "next-auth"
 import Link from "next/link"
 import { signOut } from "next-auth/react"
+// todo: remove this
 import { Edit2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 

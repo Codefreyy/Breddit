@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import { ChevronLeft } from "lucide-react"
 import { FC } from "react"
 import { buttonVariants } from "./ui/Button"
@@ -12,9 +12,13 @@ const BackButton: FC<BackButtonProps> = ({}) => {
   return (
     <div
       onClick={() => router.back()}
-      className={cn(buttonVariants({ variant: "ghost" }), "self-start -mt-20")}
+      className={cn(
+        buttonVariants({ variant: "ghost", size: "sm" }),
+        "self-start -mt-20 hover:cursor-pointer"
+      )}
     >
       <ChevronLeft className="w-4 h-4" />
+      {"Back to community"}
     </div>
   )
 }
