@@ -13,7 +13,6 @@ import { User } from "next-auth"
 import Link from "next/link"
 import { signOut } from "next-auth/react"
 // todo: remove this
-import { Edit2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
 interface UserAccountNavProps {
@@ -38,12 +37,6 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ user }) => {
           <div className="flex flex-col gap-1">
             <div className="font-medium flex gap-3 items-center">
               {user.name}{" "}
-              <Edit2
-                className="w-3 h-3 cursor-pointer hover:scale-110"
-                onClick={() => {
-                  router.push("/settings")
-                }}
-              />
             </div>
             <p className="w-[200px] truncate text-sm text-zinc-600">
               {user.email}
